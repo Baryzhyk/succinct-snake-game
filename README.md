@@ -17,10 +17,11 @@ Clone the repository:
 ```sh
 git clone https://github.com/Baryzhyk/succinct-snake-game.git
 cd succinct-snake-game
-Install dependencies for SP1:
+
+##Install dependencies for SP1:
 npm install @succinctlabs/sp1
 
-Run a local server (optional):
+##Run a local server (optional):
 npx http-server
 
 How it Works
