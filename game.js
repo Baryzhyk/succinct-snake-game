@@ -4,11 +4,12 @@ const scoreDisplay = document.getElementById("score");
 
 let snake = [{ x: 10, y: 10 }];
 let direction = "RIGHT";
+let nextDirection = "RIGHT"; // Окрема змінна для запобігання миттєвих змін
 let food = { x: Math.floor(Math.random() * 20), y: Math.floor(Math.random() * 20) };
 let score = 0;
 let gameOver = false;
 let lastRenderTime = 0;
-const SNAKE_SPEED = 3; // Менша швидкість
+const SNAKE_SPEED = 4; // Зменшена швидкість
 
 window.requestAnimationFrame(gameLoop);
 document.addEventListener("keydown", changeDirection);
@@ -21,16 +22,17 @@ function gameLoop(currentTime) {
     if (secondsSinceLastRender < 1 / SNAKE_SPEED) return;
 
     lastRenderTime = currentTime;
+    direction = nextDirection; // Напрям змінюється лише раз за кадр
     updateGame();
     drawGame();
 }
 
 function changeDirection(event) {
     const key = event.keyCode;
-    if (key === 37 && direction !== "RIGHT") direction = "LEFT";
-    else if (key === 38 && direction !== "DOWN") direction = "UP";
-    else if (key === 39 && direction !== "LEFT") direction = "RIGHT";
-    else if (key === 40 && direction !== "UP") direction = "DOWN";
+    if (key === 37 && direction !== "RIGHT") nextDirection = "LEFT";
+    else if (key === 38 && direction !== "DOWN") nextDirection = "UP";
+    else if (key === 39 && direction !== "LEFT") nextDirection = "RIGHT";
+    else if (key === 40 && direction !== "UP") nextDirection = "DOWN";
 }
 
 function updateGame() {
@@ -41,7 +43,6 @@ function updateGame() {
     if (direction === "UP") head.y -= 1;
     if (direction === "DOWN") head.y += 1;
 
-    // Перевірка на зіткнення
     if (head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20 || 
         snake.some(segment => segment.x === head.x && segment.y === head.y)) {
         gameOver = true;
