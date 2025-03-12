@@ -7,6 +7,21 @@ let direction = "RIGHT";
 let food = { x: Math.floor(Math.random() * 20), y: Math.floor(Math.random() * 20) };
 let score = 0;
 let gameOver = false;
+let lastRenderTime = 0;
+const SNAKE_SPEED = 5; // Кількість рухів на секунду
+
+function gameLoop(currentTime) {
+    window.requestAnimationFrame(gameLoop);
+    const secondsSinceLastRender = (currentTime - lastRenderTime) / 1000;
+    if (secondsSinceLastRender < 1 / SNAKE_SPEED) return; // Контроль швидкості
+
+    lastRenderTime = currentTime;
+    updateGame();
+    drawGame();
+}
+
+window.requestAnimationFrame(gameLoop);
+
 
 document.addEventListener("keydown", changeDirection);
 
