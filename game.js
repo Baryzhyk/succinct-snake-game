@@ -10,6 +10,32 @@ let gameOver = false;
 let lastRenderTime = 0;
 const SNAKE_SPEED = 5; // Рухів на секунду
 
+function updateGame() {
+    let head = { ...snake[0] };
+
+    if (direction === "LEFT") head.x -= 1;
+    if (direction === "RIGHT") head.x += 1;
+    if (direction === "UP") head.y -= 1;
+    if (direction === "DOWN") head.y += 1;
+
+    // Перевірка на зіткнення
+    if (head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20 || 
+        snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+        gameOver = true;
+        alert("Game Over! Final Score: " + score);
+        return;
+    }
+
+    snake.unshift(head);
+    if (head.x === food.x && head.y === food.y) {
+        score += 10;
+        scoreDisplay.textContent = score;
+        food = { x: Math.floor(Math.random() * 20), y: Math.floor(Math.random() * 20) };
+    } else {
+        snake.pop();
+    }
+}
+
 // 🎮 Основний ігровий цикл
 function gameLoop(currentTime) {
     if (gameOver) {
