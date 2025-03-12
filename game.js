@@ -2,30 +2,31 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const scoreDisplay = document.getElementById("score");
 
+const SQUARE_SIZE = 20;
+const CANVAS_SIZE = 400;
+const GRID_SIZE = CANVAS_SIZE / SQUARE_SIZE;
+const SNAKE_SPEED = 150; // Затримка між оновленнями в мілісекундах
+
 let snake = [{ x: 10, y: 10 }];
 let direction = "RIGHT";
-let nextDirection = "RIGHT"; // Окрема змінна для запобігання миттєвих змін
-let food = { x: Math.floor(Math.random() * 20), y: Math.floor(Math.random() * 20) };
+let nextDirection = "RIGHT";
+let food = spawnFood();
 let score = 0;
 let gameOver = false;
-let lastRenderTime = 0;
-const SNAKE_SPEED = 4; // Зменшена швидкість
 
-window.requestAnimationFrame(gameLoop);
+function gameLoop() {
+    if (gameOver) return;
+    setTimeout(() => {
+        direction = nextDirection; // Оновлюємо напрямок раз за оновлення
+        updateGame();
+        drawGame();
+        gameLoop();
+    }, SNAKE_SPEED);
+}
+
 document.addEventListener("keydown", changeDirection);
 
-function gameLoop(currentTime) {
-    if (gameOver) return;
-
-    window.requestAnimationFrame(gameLoop);
-    const secondsSinceLastRender = (currentTime - lastRenderTime) / 1000;
-    if (secondsSinceLastRender < 1 / SNAKE_SPEED) return;
-
-    lastRenderTime = currentTime;
-    direction = nextDirection; // Напрям змінюється лише раз за кадр
-    updateGame();
-    drawGame();
-}
+gameLoop();
 
 function changeDirection(event) {
     const key = event.keyCode;
@@ -43,7 +44,7 @@ function updateGame() {
     if (direction === "UP") head.y -= 1;
     if (direction === "DOWN") head.y += 1;
 
-    if (head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20 || 
+    if (head.x < 0 || head.x >= GRID_SIZE || head.y < 0 || head.y >= GRID_SIZE || 
         snake.some(segment => segment.x === head.x && segment.y === head.y)) {
         gameOver = true;
         alert("Game Over! Final Score: " + score);
@@ -54,7 +55,7 @@ function updateGame() {
     if (head.x === food.x && head.y === food.y) {
         score += 10;
         scoreDisplay.textContent = score;
-        food = { x: Math.floor(Math.random() * 20), y: Math.floor(Math.random() * 20) };
+        food = spawnFood();
     } else {
         snake.pop();
     }
@@ -62,11 +63,15 @@ function updateGame() {
 
 function drawGame() {
     ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
     ctx.fillStyle = "red";
-    ctx.fillRect(food.x * 20, food.y * 20, 20, 20);
+    ctx.fillRect(food.x * SQUARE_SIZE, food.y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE);
 
     ctx.fillStyle = "lime";
-    snake.forEach((segment) => ctx.fillRect(segment.x * 20, segment.y * 20, 20, 20));
+    snake.forEach((segment) => ctx.fillRect(segment.x * SQUARE_SIZE, segment.y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE));
+}
+
+function spawnFood() {
+    return { x: Math.floor(Math.random() * GRID_SIZE), y: Math.floor(Math.random() * GRID_SIZE) };
 }
